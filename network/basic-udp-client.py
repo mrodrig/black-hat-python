@@ -7,9 +7,10 @@ target_port = 80
 client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 # send some data
-client.sendto("Hello World!", (target_host, target_port))
+data = bytes('Hello World!', 'utf8')
+client.sendto(data, (target_host, target_port))
 
 # receive some data
 data, addr = client.recvfrom(5)
 
-print data
+print(data)

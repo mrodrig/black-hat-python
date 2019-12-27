@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys, socket, getopt, threading, subprocess, argparse
 
-"""
+'''
 Example usage:
 Listening:
     ./netcat.py -l -p 9999 -c
@@ -11,38 +11,38 @@ Execute commands:
     CTRL+D
     <BHP: #> ls -la
     ...output...
-"""
+'''
 
 # global variables
 listen      = False
 command     = False
 upload      = False
-execute     = ""
-target      = ""
-upload_dest = ""
+execute     = ''
+target      = ''
+upload_dest = ''
 port        = 0
 
 class ConvertToInt(argparse.Action):
     def __init__(self, option_strings, dest, nargs=None, **kwargs):
         if nargs is not None:
-            raise ValueError("nargs not allowed")
+            raise ValueError('nargs not allowed')
         super(ConvertToInt, self).__init__(option_strings, dest, **kwargs)
     def __call__(self, parser, namespace, values, option_string=None):
         if type(values) is str:
             setattr(namespace, self.dest, int(values))
-        else: raise Exception("Non-convertible value provided for ConvertToInt")
+        else: raise Exception('Non-convertible value provided for ConvertToInt')
 
 def process_options():
     global listen, port, execute, command, upload_dest, target, upload
 
     parser = argparse.ArgumentParser(description='BHP Netcat Tool')
-    # parser.add_argument("-h", "--help", action="store_true", help="print help and exit")
-    parser.add_argument("-t", "--target", default="")
-    parser.add_argument("-p", "--port", action=ConvertToInt)
-    parser.add_argument("-l", "--listen", action="store_true")
-    parser.add_argument("-e", "--execute", default="")
-    parser.add_argument("-c", "--command", action="store_true", default=False)
-    parser.add_argument("-u", "--upload", default="")
+    # parser.add_argument('-h', '--help', action='store_true', help='print help and exit')
+    parser.add_argument('-t', '--target', default='')
+    parser.add_argument('-p', '--port', action=ConvertToInt)
+    parser.add_argument('-l', '--listen', action='store_true')
+    parser.add_argument('-e', '--execute', default='')
+    parser.add_argument('-c', '--command', action='store_true', default=False)
+    parser.add_argument('-u', '--upload', default='')
     args = parser.parse_args()
 
     listen = args.listen
@@ -61,41 +61,42 @@ def client_sender(buffer):
         client.connect((target, port))
 
         if len(buffer):
-            client.send(buffer)
+            client.send(bytes(buffer, 'utf8'))
 
         while True:
             # now wait for data back
             recv_len = 1
-            response = ""
+            response = ''
 
             while recv_len:
-                data = client.recv(4096)
+                data = str(client.recv(4096), 'utf8')
                 recv_len = len(data)
                 response += data
 
                 if recv_len < 4096:
                     break
 
-            print response,
+            print(response, end = ' ')
 
             # wait for more input
-            buffer = raw_input("")
-            buffer += "\n"
+            buffer = input('')
+            buffer += '\n'
 
             # send it off
-            client.send(buffer)
-    except:
-        print "[*] Exception! Exiting..."
+            client.send(bytes(buffer, 'utf8'))
+    except Exception as ex:
+        print('[*] Exception! Exiting...')
 
         # tear down the connection
         client.close()
+        raise ex
 
 def server_loop():
     global target
 
     # if no target is defined, we listen on all interfaces
     if not len(target):
-        target = "0.0.0.0"
+        target = '0.0.0.0'
 
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((target, port))
@@ -117,7 +118,7 @@ def run_command(command):
     try:
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
     except:
-        output = "Failed to execute command.\r\n"
+        output = 'Failed to execute command.\r\n'
 
     # send the output back to the client
     return output
@@ -128,7 +129,7 @@ def client_handler(client_socket):
     # check for upload
     if len(upload_dest):
         # read in all of the bytes and write to our destination
-        file_buffer = ""
+        file_buffer = ''
 
         # keep reading data until none is available
         while True:
@@ -146,27 +147,27 @@ def client_handler(client_socket):
             file_desc.close()
 
             # acknowledge that we wrote the file out
-            client_socket.send('Successfully saved the file to %s\r\n' % upload_dest)
+            client_socket.send(bytes('Successfully saved the file to %s\r\n' % upload_dest, 'utf8'))
         except:
-            client_socket.send("Failed to save file to %s\r\n" % upload_dest)
+            client_socket.send(bytes('Failed to save file to %s\r\n' % upload_dest, 'utf8'))
 
     # check for command execution
     if len(execute):
         # run the command
         output = run_command(execute)
 
-        client_socket.send(output)
+        client_socket.send(bytes(output, 'utf8'))
 
     # now we go into another loop if a command shell was requested
     if command:
         while True:
             # show a simple prompt
-            client_socket.send("<BHP: #> ")
+            client_socket.send(bytes('<BHP: #> ', 'utf8'))
 
             # now we receive until we see a linefeed (enter key)
-            cmd_buffer = ""
-            while "\n" not in cmd_buffer:
-                cmd_buffer += client_socket.recv(1024)
+            cmd_buffer = ''
+            while '\n' not in cmd_buffer:
+                cmd_buffer += str(client_socket.recv(1024), 'utf8')
 
             # capture the command output
             response = run_command(cmd_buffer)

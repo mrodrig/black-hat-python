@@ -1,9 +1,9 @@
 # black-hat-python
-Coding Examples and Exercises from "Black Hat Python: Python Programming for Hackers and Pentesters"
+Coding Examples and Exercises (converted to Python 3) from "Black Hat Python: Python Programming for Hackers and Pentesters"
 
 ## Setup
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ## Usage
