@@ -14,7 +14,7 @@ def process_options():
     
     return (args.host, args.port, args.username, args.password)
 
-def ssh_command(host, port, user, password, command):
+def ssh_command(host, port, user, password):
     client = paramiko.SSHClient()
     # client.load_host_keys('~/.ssh/known_hosts')
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -23,8 +23,7 @@ def ssh_command(host, port, user, password, command):
     ssh_session = client.get_transport().open_session()
     
     if ssh_session.active:
-        ssh_session.exec_command(command)
-        print((str(ssh_session.recv(1024), 'utf8')))
+        print(str(ssh_session.recv(1024), 'utf8'))
         
         while True:
             command = ssh_session.recv(1024) # get the command from the ssh server
@@ -39,4 +38,4 @@ def ssh_command(host, port, user, password, command):
 
 if __name__ == '__main__':
     host, port, username, password = process_options()
-    ssh_command(host, port, username, password, 'ClientConnected')
+    ssh_command(host, port, username, password)

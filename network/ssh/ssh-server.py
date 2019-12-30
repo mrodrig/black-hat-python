@@ -58,13 +58,6 @@ def create_server(server, port):
             sys.exit(1)
         
         print("[+] Authenticated!")
-        data = chan.recv(1024)
-        print((str(data, 'utf8')))
-
-        server.event.wait(10)
-        if not server.event.is_set():
-            print("[*] Client never asked for a shell.")
-            sys.exit(1)
         
         chan.send("Welcome to BHP_SSH")
         
@@ -72,11 +65,11 @@ def create_server(server, port):
             try:
                 command = input("Enter a command: ").strip('\n')
                 if command != 'exit':
-                    chan.send(bytes(str(command, 'utf8')))
+                    chan.send(command)
                     data = chan.recv(1024)
                     print(("%s\n" % str(data, 'utf8')))
                 else:
-                    chan.send(bytes("exit", 'utf8'))
+                    chan.send("exit")
                     print("exiting")
                     bhSession.close()
                     raise Exception("exit")
@@ -88,6 +81,7 @@ def create_server(server, port):
             if bhSession: bhSession.close()
         except:
             pass
+        raise e
         sys.exit(1)
 
 if __name__ == '__main__':
