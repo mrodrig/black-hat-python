@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-import sys, socket, getopt, threading, subprocess, argparse
-
+import sys, socket, threading, subprocess, argparse
+from .utils import utils
 '''
 Example usage:
 Listening:
@@ -22,23 +22,13 @@ target      = ''
 upload_dest = ''
 port        = 0
 
-class ConvertToInt(argparse.Action):
-    def __init__(self, option_strings, dest, nargs=None, **kwargs):
-        if nargs is not None:
-            raise ValueError('nargs not allowed')
-        super(ConvertToInt, self).__init__(option_strings, dest, **kwargs)
-    def __call__(self, parser, namespace, values, option_string=None):
-        if type(values) is str:
-            setattr(namespace, self.dest, int(values))
-        else: raise Exception('Non-convertible value provided for ConvertToInt')
-
 def process_options():
     global listen, port, execute, command, upload_dest, target, upload
 
     parser = argparse.ArgumentParser(description='BHP Netcat Tool')
     # parser.add_argument('-h', '--help', action='store_true', help='print help and exit')
     parser.add_argument('-t', '--target', default='')
-    parser.add_argument('-p', '--port', action=ConvertToInt)
+    parser.add_argument('-p', '--port', action=utils.ConvertToInt)
     parser.add_argument('-l', '--listen', action='store_true')
     parser.add_argument('-e', '--execute', default='')
     parser.add_argument('-c', '--command', action='store_true', default=False)
