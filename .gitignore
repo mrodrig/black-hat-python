@@ -1,1 +1,6 @@
+bin
+include
+lib
+pyvenv.cfg
 .idea
+activate_venv.sh
