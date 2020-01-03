@@ -1,4 +1,5 @@
 import sys, socket, threading, argparse
+sys.path.append('..')
 from utils import utils
 
 """

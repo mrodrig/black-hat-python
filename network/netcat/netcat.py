@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys, socket, threading, subprocess, argparse
-from .utils import utils
+from network.utils import utils
 '''
 Example usage:
 Listening:
