@@ -1,6 +1,15 @@
 from scapy.all import *
 import os, threading, signal
 
+"""
+Be sure to enable IP forwarding:
+Linux:
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+Mac:
+sudo sysctl -w net.inet.ip.forwarding=1
+"""
+
 interface = "en1"
 target_ip = "10.0.0.8" # ip address to direct traffic to
 gateway_ip = "10.0.0.1" # ip address of the actual gateway
