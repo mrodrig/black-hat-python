@@ -1,7 +1,7 @@
-import re, zlib, cv2
+import re, zlib, cv2, os
 from scapy.all import *
 
-base_path = '/home/mike/Programming/black-hat-python/network/carving'
+base_path = os.path.realpath(os.path.dirname(__file__))
 pictures_directory = '%s/pictures' % base_path
 faces_directory = '%s/faces' % base_path
 pcap_file = 'bhp.pcap'
@@ -19,7 +19,7 @@ def http_assembler(pcap_file):
         
         for packet in sessions[session]:
             try:
-                if packet[TCP].dport == 80 or packet.[TCP].sport == 80:
+                if packet[TCP].dport == 80 or packet[TCP].sport == 80:
                     # reassemble the stream
                     http_payload += str(packet[TCP].payload)
             except:
